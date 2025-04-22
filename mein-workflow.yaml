@@ -1,0 +1,48 @@
+# 1. Name des Workflows, angezeigt in der GitHub Actions UI
+name: "Hello World Workflow"
+
+# 2. Trigger-Ereignisse, die den Workflow starten
+on:
+  push:                          # Bei jedem Push in den definierten Branches
+    branches:
+      - main                     # Nur auf dem 'main'-Branch
+  pull_request:                  # Bei Pull Requests gegen 'main'
+  workflow_dispatch:             # Ermöglicht manuelles Auslösen in der UI
+
+# 3. Globale Umgebungsvariablen für alle Jobs und Schritte
+env:
+  GREETING: "Hello, GitHub Actions!"
+
+jobs:
+  # 4. Definiert den 'hello'-Job
+  hello:
+    runs-on: ubuntu-latest       # 5. Läuft auf Ubuntu-Linux
+
+    steps:
+      # 6. Holt den Code aus dem Repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 7. Gibt die Begrüßung aus der Umgebungsvariable aus
+      - name: Begrüßung ausgeben
+        run: echo "${{ env.GREETING }}"
+
+      # 8. Zeigt Details zum GitHub-Kontext an
+      - name: GitHub-Kontext zeigen
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+
+      # 9. Erstellt eine Datei im Arbeitsverzeichnis und schreibt ein Datum hinein
+      - name: Datei generieren
+        run: |
+          echo "Diese Datei wurde durch GitHub Actions erstellt." > generated-file.txt
+          echo "Zeitstempel: $(date)" >> generated-file.txt
+
+      # 10. Lädt das generierte Artefakt hoch
+      - name: Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-file
+          path: generated-file.txt
